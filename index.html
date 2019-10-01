@@ -60,6 +60,7 @@ input, button {
 
 
       const SET_USER = 'SET_USER';
+      const SET_NOTES = 'SET_NOTES';
 
       const userReducer = (state = {}, action)=> {
         switch(action.type){
@@ -69,6 +70,10 @@ input, button {
         return state
       };
       const noteReducer = (state = [], action)=> {
+        switch(action.type) {
+          case SET_NOTES:
+            return action.note;
+        }
         return state
       };
 
@@ -80,20 +85,30 @@ input, button {
       const store = createStore(reducer, applyMiddleware(ReduxThunk.default));
 
       const setUser = (user)=>({ type: SET_USER, user });
+
       store.subscribe(()=> {
-        console.log(store.getState());
+        console.log("STATE USER ID", store.getState().user.id);
       });
 
       const getUser = ()=> {
         return async(dispatch)=>{
           const user = await fetchUser();
-          console.log(user);
           dispatch({ type: SET_USER, user });
         }
       };
 
+      const getNotes = () => {
+        console.log("STORE STATE", store.getState())
+        return async(dispatch) => {
+          const notes = (await axios.get(`${API}/users/${state.user.id}/notes`)).data;
+          dispatch({ type: SET_NOTES, notes})
+        }
+      }
+
+
       // console.log(getUser());
       store.dispatch(getUser());
+      store.dispatch(getNotes());
       // console.log('hi', store.getState());
 
 
